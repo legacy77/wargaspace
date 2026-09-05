@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover">
+  <title>WargaSpace</title>
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0}
+    html,body{background:#f8fafc;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;color:#0f172a}
+    .wrap{max-width:448px;margin:0 auto;padding:16px 16px 100px}
+    
+    /* Neo-brutalist Card & Shadow */
+    .card{background:#fff;border:2px solid #0f172a;border-radius:16px;box-shadow:4px 4px 0 #0f172a;padding:20px;margin-bottom:16px}
+    .input{width:100%;border:2px solid #0f172a;border-radius:12px;padding:14px;font-size:16px;background:#fff;outline:none;margin-top:4px;box-shadow:2px 2px 0 #0f172a}
+    .input:focus{background:#eff6ff}
+    
+    /* Tactile Hard Button */
+    .btn{display:block;width:100%;border-radius:12px;padding:15px;font-size:16px;font-weight:700;min-height:52px;border:2px solid #0f172a;cursor:pointer;background:#2563eb;color:#fff;box-shadow:4px 4px 0 #0f172a;transition:transform 0.1s, box-shadow 0.1s}
+    .btn:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #0f172a}
+    .btn-green{background:#22c55e;color:#0f172a}
+    .btn-red{background:#ef4444;color:#fff}
+    
+    .lbl{display:block;font-size:13px;font-weight:700;color:#0f172a}
+    .fg{margin-bottom:14px}
+    
+    /* Floating Bar with Hard Border */
+    .nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:2px solid #0f172a;display:flex;padding-bottom:env(safe-area-inset-bottom);z-index:50;box-shadow:0 -4px 0 #0f172a}
+    .nav a{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 0;font-size:12px;font-weight:700;color:#64748b;text-decoration:none;cursor:pointer}
+    .nav a.on{color:#2563eb;background:#eff6ff;border-top:3px solid #2563eb}
+    
+    /* Punchy Pastel Badges */
+    .badge{display:inline-block;padding:4px 10px;border-radius:8px;font-size:11px;font-weight:800;border:1.5px solid #0f172a}
+    .bg-green{background:#dcfce7;color:#166534}
+    .bg-yellow{background:#fef9c3;color:#854d0e}
+    .bg-red{background:#fee2e2;color:#991b1b}
+    .bg-gray{background:#f1f5f9;color:#475569}
+    .bg-blue{background:#dbeafe;color:#1e40af}
+
+    .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:96px;background:#0f172a;color:#fff;padding:12px 20px;border-radius:12px;font-size:14px;font-weight:600;z-index:60;display:none;max-width:90%;text-align:center;border:2px solid #fff;box-shadow:4px 4px 0 #2563eb}
+    .toast.show{display:block}
+    
+    .hdr{background:#2563eb;color:#fff;border:2px solid #0f172a;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:4px 4px 0 #0f172a;display:flex;justify-content:space-between;align-items:center}
+    .hdr h1{font-size:20px;font-weight:800}
+    .hdr p{font-size:12px;opacity:.9;margin-top:2px}
+    .btn-out{background:#0f172a;border:2px solid #fff;color:#fff;padding:8px 14px;border-radius:8px;font-size:12px;font-weight:700;cursor:pointer}
+    
+    .tile{background:#fff;border:2px solid #0f172a;border-radius:16px;padding:16px;box-shadow:4px 4px 0 #0f172a;cursor:pointer;text-decoration:none;color:inherit;display:block;transition:transform 0.1s, box-shadow 0.1s}
+    .tile:active{transform:translate(2px,2px);box-shadow:2px 2px 0 #0f172a}
+    .tile h2{font-size:15px;font-weight:800;margin-top:10px}
+    .tile p{font-size:12px;color:#64748b;margin-top:2px}
+    
+    .icon{width:44px;height:44px;border-radius:12px;border:2px solid #0f172a;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;box-shadow:2px 2px 0 #0f172a}
+    
+    .dark{background:#0f172a;color:#fff;border:2px solid #0f172a;border-radius:16px;padding:20px;margin-bottom:16px;box-shadow:4px 4px 0 #2563eb}
+    .lbl-sm{font-size:10px;text-transform:uppercase;letter-spacing:1px;color:#94a3b8;font-weight:800;margin-bottom:8px}
+    
+    /* Monospace amounts */
+    .amt{font-size:30px;font-weight:800;font-family:monospace;letter-spacing:-1px}
+    .mono{font-family:monospace}
+    
+    .sh{font-size:13px;font-weight:800;margin-bottom:10px;text-transform:uppercase;letter-spacing:.5px;color:#334155}
+    .modal-fixed{position:fixed;inset:0;background:rgba(15,23,42,.6);z-index:100;display:none;align-items:flex-end;justify-content:center}
+    .modal-fixed.open{display:flex}
+    .modal-box{background:#fff;width:100%;max-width:448px;border-radius:24px 24px 0 0;border-top:2px solid #0f172a;border-left:2px solid #0f172a;border-right:2px solid #0f172a;padding:24px;max-height:90vh;overflow-y:auto;box-shadow:0 -8px 0 #0f172a}
+    .mh{display:flex;justify-content:space-between;align-items:center;border-bottom:2px solid #f1f5f9;padding-bottom:16px;margin-bottom:16px}
+    .mx{background:#fee2e2;border:2px solid #0f172a;width:32px;height:32px;border-radius:8px;font-size:18px;font-weight:800;color:#991b1b;cursor:pointer}
+    .thumb{width:100%;height:160px;object-fit:cover;border-radius:12px;border:2px solid #0f172a;display:none;margin-top:8px}
+    .thumb.show{display:block}
+    
+    .ri{display:flex;justify-content:space-between;align-items:center;padding:14px;background:#fff;border-radius:12px;margin-bottom:8px;border:2px solid #0f172a;box-shadow:2px 2px 0 #0f172a}
+    .sm{color:#64748b}
+    
+    .tab-row{display:flex;gap:8px;margin-bottom:14px}
+    .tab-row a{flex:1;text-align:center;padding:12px;background:#fff;border-radius:12px;font-size:13px;font-weight:800;color:#475569;text-decoration:none;cursor:pointer;border:2px solid #0f172a;box-shadow:2px 2px 0 #0f172a}
+    .tab-row a.on{background:#2563eb;color:#fff}
+    
+    .admin-item{background:#fff;border-radius:14px;padding:16px;margin-bottom:12px;border:2px solid #0f172a;box-shadow:3px 3px 0 #0f172a}
+  </style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+<div id="app"></div>
+<div id="nav"></div>
+<script>
+var S={t:'',u:null,i:null,s:[],tg:null,r:[],j:[]};
+var BM={'MENUNGGU':['Menunggu Verifikasi ⏳','bg-yellow'],'DISETUJUI':['Disetujui ✅','bg-green'],'DITOLAK':['Ditolak ❌','bg-red'],'LUNAS':['Lunas 🎉','bg-green'],'BELUM_BAYAR':['Belum Bayar ⚠️','bg-red']};
+
+function api(f){var a=Array.prototype.slice.call(arguments,1);return new Promise(function(su,fa){google.script.run.withSuccessHandler(function(r){if(r&&r.ok===false&&r.message){fa(new Error(r.message));return;}su(r);}).withFailureHandler(function(e){fa(new Error((e&&e.message)||'Error'));})[f].apply(null,a);});}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function toast(m){var e=document.getElementById('toast');e.textContent=m;e.classList.add('show');clearTimeout(e._t);e._t=setTimeout(function(){e.classList.remove('show');},3000);}
+function busy(b,o){if(o){b.dataset.o=b.innerHTML;b.disabled=true;b.innerHTML='Memproses...';b.style.opacity=.6;}else{b.disabled=false;b.innerHTML=b.dataset.o||b.innerHTML;b.style.opacity=1;}}
+function rp(n){return 'Rp '+Number(n||0).toLocaleString('id-ID');}
+function badge(s){var b=BM[s]||[s,'bg-gray'];return '<span class="badge '+b[1]+'">'+b[0]+'</span>';}
+
+function go(p){
+  if(p==='login'){document.getElementById('nav').innerHTML='';renderLogin();return;}
+  renderNav(p);
+  if(p==='home'){renderHome();return;}
+  if(p==='surat'){api('getJenisSuratMeta').then(function(m){S.j=m;return api('listSuratKK',S.t);}).then(function(l){S.s=l;renderSurat();}).catch(function(e){toast(e.message);});return;}
+  if(p==='iuran'){Promise.all([api('getTagihanAktif',S.t),api('riwayatIuran',S.t)]).then(function(a){S.tg=a[0];S.r=a[1];renderIuran();}).catch(function(e){toast(e.message);});return;}
+  if(p==='info'){renderInfo();return;}
+  if(p==='admin'){renderAdmin();return;}
+}
+
+function renderNav(c){
+  var it=[['home','🏠 Beranda'],['surat','✉️ Surat'],['iuran','💳 Iuran'],['info','ℹ️ Info']];
+  if(S.u && S.u.isAdmin) it.push(['admin','🛡️ Admin']);
+  var h='<div class="nav">';
+  for(var i=0;i<it.length;i++){h+='<a href="javascript:go(\''+it[i][0]+'\')" class="'+(c===it[i][0]?'on':'')+'">'+it[i][1]+'</a>';}
+  h+='</div>';
+  document.getElementById('nav').innerHTML=h;
+}
+
+function renderLogin(){
+  document.getElementById('app').innerHTML='<div class="wrap"><div style="text-align:center;margin:32px 0"><div style="width:72px;height:72px;background:#2563eb;color:#fff;border:3px solid #0f172a;border-radius:20px;box-shadow:4px 4px 0 #0f172a;display:flex;align-items:center;justify-content:center;font-size:32px;font-weight:800;margin:0 auto 12px">W</div><h1 style="font-size:26px;font-weight:800">WargaSpace</h1><p class="sm" style="font-size:13px;margin-top:4px">One stop, zero drama: urus RT dari HP ✨</p></div><div class="card"><h2 style="font-size:18px;font-weight:800;margin-bottom:16px">Masuk Akun KK 🏠</h2><div class="fg"><span class="lbl">Nomor Kartu Keluarga (KK)</span><input id="kk" class="input" placeholder="3271xxxxxxxxxxxx"></div><div class="fg"><span class="lbl">Sandi / PIN KK</span><input id="sandi" type="password" class="input" placeholder="••••"></div><button id="go-login" class="btn" style="margin-top:8px">Masuk Sekarang 🚀</button></div></div>';
+  document.getElementById('go-login').addEventListener('click',doLogin);
+}
+
+function renderHome(){
+  var u=S.u,i=S.i;
+  var adminTile=u.isAdmin?'<a class="tile" style="margin-bottom:16px;background:#fef9c3;border:2px solid #0f172a;box-shadow:4px 4px 0 #0f172a" data-go="admin"><div class="icon" style="background:#fde047;color:#854d0e">🛡️</div><h2>Panel Pengurus / Admin</h2><p>Verifikasi surat & iuran warga</p></a>':'';
+  document.getElementById('app').innerHTML='<div class="wrap"><div class="hdr"><div><p>Halo, selamat datang 👋</p><h1>'+esc(u.nama)+'</h1><p>Rumah No. '+esc(u.nomorRumah)+' &bull; KK: '+esc(u.nomorKK)+'</p></div><button class="btn-out" onclick="doLogout()">Keluar 🚪</button></div>'+adminTile+'<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px"><a class="tile" data-go="surat"><div class="icon" style="background:#dbeafe;color:#1d4ed8">✉️</div><h2>Layanan Surat</h2><p>Ajukan &amp; unduh cepat</p></a><a class="tile" data-go="iuran"><div class="icon" style="background:#dcfce7;color:#166534">💳</div><h2>Kas &amp; Iuran</h2><p>Cek iuran &amp; bayar</p></a></div><div class="card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px"><h2 style="font-size:16px;font-weight:800">Info &amp; Darurat RT</h2><a href="javascript:go(\'info\')" style="font-size:12px;color:#2563eb;font-weight:700;text-decoration:none">Semua &rarr;</a></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:12px"><div class="sm" style="font-size:11px;font-weight:700">Lingkungan RT</div><div style="font-size:13px;font-weight:800;margin-top:2px">'+esc(i.namaRT)+'</div></div><div style="background:#f8fafc;border:2px solid #e2e8f0;border-radius:12px;padding:12px"><div class="sm" style="font-size:11px;font-weight:700">Posyandu</div><div style="font-size:13px;font-weight:800;margin-top:2px">'+esc(i.posyandu)+'</div></div></div></div></div>';
+  var tiles=document.querySelectorAll('[data-go]');
+  for(var idx=0;idx<tiles.length;idx++){
+    (function(t){
+      t.addEventListener('click',function(e){e.preventDefault();go(t.getAttribute('data-go'));});
+    })(tiles[idx]);
+  }
+}
+
+function renderSurat(){
+  var l=S.s;
+  var cards=l.length===0?'<div class="card sm" style="text-align:center;padding:32px">Belum ada surat nih, yuk buat sekarang! ✉️✨</div>':l.map(function(s){var x='<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start"><div><div style="font-size:12px;font-weight:800;color:#1d4ed8">'+esc(s.jenis)+'</div><div class="sm" style="font-size:11px;margin-top:2px">'+esc(s.timestamp)+'</div></div>'+badge(s.status)+'</div>';if(s.catatan){x+='<p class="sm" style="font-size:12px;background:#f8fafc;border:1.5px solid #e2e8f0;padding:10px;border-radius:10px;margin-top:10px">Catatan: '+esc(s.catatan)+'</p>';}if(s.status==='DISETUJUI'&&s.linkPDF){x+='<a href="'+esc(s.linkPDF)+'" target="_blank" class="btn btn-ghost" style="margin-top:12px;text-align:center;text-decoration:none">📥 Unduh PDF Surat</a>';}return x+'</div>';}).join('');
+  document.getElementById('app').innerHTML='<div class="wrap"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><div><h1 style="font-size:22px;font-weight:800">Layanan Surat</h1><p class="sm" style="font-size:12px">Pengajuan surat mandiri anti ribet</p></div><button onclick="oms()" style="padding:10px 18px;background:#2563eb;color:#fff;border:2px solid #0f172a;box-shadow:3px 3px 0 #0f172a;border-radius:12px;font-size:13px;font-weight:800;cursor:pointer">+ Buat</button></div>'+cards+'</div>';
+}
+
+function renderIuran(){
+  var t=S.tg,r=S.r,act='';
+  if(t.status==='BELUM_BAYAR'||t.status==='DITOLAK'){act='<button onclick="omb()" class="btn" style="margin-top:14px;background:#22c55e;color:#0f172a">Konfirmasi Bayar Sekarang 💸</button>';}
+  else if(t.status==='MENUNGGU'){act='<p style="margin-top:14px;font-size:13px;color:#854d0e;text-align:center;padding:10px;background:#fef9c3;border:2px solid #0f172a;border-radius:10px;font-weight:700">⏳ Menunggu verifikasi pengurus</p>';}
+  else if(t.status==='LUNAS'){act='<p style="margin-top:14px;font-size:13px;color:#166534;text-align:center;padding:10px;background:#dcfce7;border:2px solid #0f172a;border-radius:10px;font-weight:700">🎉 Iuran Bulan Ini Lunas</p>';}
+  var cat=t.catatan?'<p style="font-size:12px;color:#fef08a;margin-top:8px;font-weight:600">Catatan: '+esc(t.catatan)+'</p>':'';
+  var list=r.length===0?'<div class="card sm" style="text-align:center;padding:32px">Belum ada riwayat pembayaran.</div>':r.map(function(x){var b=x.bukti?'<br><a href="'+esc(x.bukti)+'" target="_blank" class="sm" style="font-size:11px;color:#2563eb;font-weight:700;text-decoration:underline">Lihat Bukti</a>':'';return '<div class="ri"><div><div style="font-weight:800;font-size:14px">Bulan '+x.bulan+' / '+x.tahun+'</div><div class="sm mono" style="font-size:13px;margin-top:2px">'+rp(x.nominal)+'</div></div><div style="text-align:right">'+badge(x.status)+b+'</div></div>';}).join('');
+  document.getElementById('app').innerHTML='<div class="wrap"><div><h1 style="font-size:22px;font-weight:800">Kas &amp; Iuran</h1><p class="sm" style="font-size:12px">Transparansi keuangan warga RT</p></div><div class="dark" style="margin-top:14px"><div style="display:flex;justify-content:space-between;align-items:center"><span class="lbl-sm" style="color:#94a3b8">Iuran Bulan '+t.bulan+' / '+t.tahun+'</span>'+badge(t.status)+'</div><div class="amt mono" style="margin:8px 0">'+rp(t.nominal)+'</div>'+cat+act+'</div><div class="sh" style="margin-top:20px">Riwayat Pembayaran</div>'+list+'</div>';
+}
+
+function renderInfo(){
+  var i=S.i;
+  var dr=i.darurat.map(function(d){return '<a href="tel:'+esc(d.no)+'" class="tile" style="display:block;text-decoration:none;color:inherit;padding:12px"><div class="sm" style="font-size:11px;font-weight:700">'+esc(d.nama)+'</div><div class="mono" style="font-size:16px;font-weight:800;color:#1d4ed8;margin-top:4px">'+esc(d.no)+'</div></a>';}).join('');
+  var pg=i.pengumuman.length===0?'<div class="card sm" style="text-align:center;padding:32px">Belum ada pengumuman saat ini.</div>':i.pengumuman.map(function(p){return '<div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px"><h2 style="font-size:15px;font-weight:800">'+esc(p.Judul)+'</h2><span class="sm" style="font-size:11px">'+esc(p.Tanggal)+'</span></div><p style="font-size:13px;line-height:1.5;color:#334155">'+esc(p.Isi)+'</p></div>';}).join('');
+  document.getElementById('app').innerHTML='<div class="wrap"><div><h1 style="font-size:22px;font-weight:800">Info &amp; Darurat RT</h1><p class="sm" style="font-size:12px">Kontak penting, jadwal, &amp; pengumuman warga</p></div><div style="margin-top:16px"><div class="sh">Nomor Darurat 🚨</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">'+dr+'</div></div><div class="card"><div class="sh">Jadwal Posyandu 👶</div><p style="font-size:14px;color:#334155;background:#f8fafc;border:1.5px solid #e2e8f0;padding:14px;border-radius:12px;font-weight:600">'+esc(i.posyandu)+'</p></div><div class="card"><div class="sh">Pengurus RT 🤝</div><div style="display:flex;justify-content:space-between;align-items:center;background:#f8fafc;border:1.5px solid #e2e8f0;padding:14px;border-radius:12px"><div><div style="font-weight:800;font-size:14px">'+esc(i.namaPengurus)+'</div><div class="sm mono" style="font-size:12px;margin-top:2px">'+esc(i.noHpPengurus)+'</div></div><a href="https://wa.me/'+esc(i.noHpPengurus)+'" target="_blank" style="padding:10px 18px;background:#22c55e;color:#0f172a;border:2px solid #0f172a;box-shadow:2px 2px 0 #0f172a;border-radius:10px;font-size:12px;font-weight:800;text-decoration:none">WhatsApp 💬</a></div></div><div class="sh" style="margin-top:20px">Pengumuman 📢</div>'+pg+'</div>';
+}
+
+function renderAdmin(){
+  document.getElementById('app').innerHTML='<div class="wrap"><div style="margin-bottom:4px"><h1 style="font-size:22px;font-weight:800">Panel Pengurus / Admin 🛡️</h1><p class="sm" style="font-size:12px">Verifikasi surat &amp; iuran warga RT</p></div><div class="tab-row" style="margin-top:16px"><a class="on" data-tab="surat">✉️ Surat Pending</a><a data-tab="iuran">💳 Iuran Pending</a><a data-tab="rekap">📊 Rekap Kas</a></div><div id="adm-content"><p class="sm" style="text-align:center;padding:24px">Memuat...</p></div></div>';
+  var tabs=document.querySelectorAll('.tab-row a');
+  for(var i=0;i<tabs.length;i++){
+    (function(t){
+      t.addEventListener('click',function(){
+        var all=document.querySelectorAll('.tab-row a');
+        for(var j=0;j<all.length;j++) all[j].classList.remove('on');
+        t.classList.add('on');
+        S.atab=t.getAttribute('data-tab');
+        loadAdminTab(S.atab);
+      });
+    })(tabs[i]);
+  }
+  S.atab='surat';
+  loadAdminTab('surat');
+}
+
+function loadAdminTab(tab){
+  var c=document.getElementById('adm-content');
+  c.innerHTML='<p class="sm" style="text-align:center;padding:24px">Memuat data...</p>';
+  if(tab==='surat'){
+    api('adminGetSuratMenunggu').then(function(rows){
+      if(!rows.length){c.innerHTML='<div class="card sm" style="text-align:center;padding:32px">Tidak ada surat menunggu. 👍</div>';return;}
+      c.innerHTML=rows.map(function(s){
+        return '<div class="admin-item"><div><div style="font-size:14px;font-weight:800">'+esc(s.Nama)+'</div><div class="sm" style="font-size:11px;margin-top:2px">KK: '+esc(s.Nomor_KK)+' &bull; '+esc(s.Jenis_Surat)+'</div><div class="sm" style="font-size:11px">'+esc(s.Timestamp)+'</div></div><div style="display:flex;gap:10px;margin-top:12px"><button data-act="approve" data-id="'+esc(s.ID_Surat)+'" class="btn btn-green" style="flex:1;padding:10px;font-size:13px">Setuju ✅</button><button data-act="reject" data-id="'+esc(s.ID_Surat)+'" class="btn btn-red" style="flex:1;padding:10px;font-size:13px">Tolak ❌</button></div></div>';
+      }).join('');
+      bindAdminActions();
+    }).catch(function(e){c.innerHTML='<div class="card" style="color:#ef4444;font-weight:700">'+esc(e.message)+'</div>';});
+  } else if(tab==='iuran'){
+    api('adminGetIuranMenunggu').then(function(rows){
+      if(!rows.length){c.innerHTML='<div class="card sm" style="text-align:center;padding:32px">Tidak ada iuran menunggu. 👍</div>';return;}
+      c.innerHTML=rows.map(function(x){
+        return '<div class="admin-item"><div><div style="font-size:14px;font-weight:800">KK: '+esc(x.Nomor_KK)+'</div><div class="sm" style="font-size:11px">Bulan '+x.Bulan_Iuran+'/'+x.Tahun+' &bull; <span class="mono">'+rp(x.Nominal)+'</span></div><div class="sm" style="font-size:11px">'+esc(x.Timestamp)+'</div></div>'+(x.Bukti_Bayar_Link?'<a href="'+esc(x.Bukti_Bayar_Link)+'" target="_blank" style="font-size:12px;color:#2563eb;display:inline-block;margin-top:8px;font-weight:700">🖼️ Lihat Bukti Transfer</a>':'')+'<div style="display:flex;gap:10px;margin-top:12px"><button data-act="verify" data-id="'+esc(x.ID_Transaksi)+'" class="btn btn-green" style="flex:1;padding:10px;font-size:13px">Valid (Lunas) ✅</button><button data-act="tolak" data-id="'+esc(x.ID_Transaksi)+'" class="btn btn-red" style="flex:1;padding:10px;font-size:13px">Tolak ❌</button></div></div>';
+      }).join('');
+      bindAdminActions();
+    }).catch(function(e){c.innerHTML='<div class="card" style="color:#ef4444;font-weight:700">'+esc(e.message)+'</div>';});
+  } else if(tab==='rekap'){
+    api('adminGetRekap').then(function(r){
+      var keys=Object.keys(r.perBulan||{});
+      var html='<div class="card" style="background:#eff6ff;border:2px solid #2563eb;box-shadow:4px 4px 0 #2563eb"><div class="sm" style="font-size:12px;font-weight:700">Total Kas Lunas Terkumpul</div><div class="amt mono" style="color:#1d4ed8;margin-top:6px">'+rp(r.totalKas)+'</div></div>';
+      if(!keys.length) html+='<div class="card sm" style="text-align:center;padding:32px">Belum ada kas masuk.</div>';
+      else html+=keys.map(function(k){return '<div class="ri"><div style="font-weight:800">Bulan '+esc(k)+'</div><div class="mono" style="font-weight:800;color:#166534">'+rp(r.perBulan[k])+'</div></div>';}).join('');
+      c.innerHTML=html;
+    }).catch(function(e){c.innerHTML='<div class="card" style="color:#ef4444;font-weight:700">'+esc(e.message)+'</div>';});
+  }
+}
+
+function bindAdminActions(){
+  var btns=document.querySelectorAll('#adm-content [data-act]');
+  for(var i=0;i<btns.length;i++){
+    (function(b){
+      b.addEventListener('click',function(){
+        var id=b.getAttribute('data-id');
+        var act=b.getAttribute('data-act');
+        if(act==='approve'){procAdmin(b,'adminApproveSurat',[id,'Disetujui RT']);}
+        else if(act==='reject'){var note=prompt('Alasan penolakan:','');if(!note)return;procAdmin(b,'adminRejectSurat',[id,note]);}
+        else if(act==='verify'){procAdmin(b,'adminVerifyIuran',[id,'Lunas']);}
+        else if(act==='tolak'){var note2=prompt('Alasan penolakan bukti:','');if(!note2)return;procAdmin(b,'adminTolakIuran',[id,note2]);}
+      });
+    })(btns[i]);
+  }
+}
+
+function procAdmin(btn,fn,args){
+  busy(btn,true);
+  api.apply(null,[fn].concat(args)).then(function(){
+    toast('Berhasil diproses! 👍');
+    loadAdminTab(S.atab||'surat');
+  }).catch(function(e){toast(e.message);busy(btn,false);});
+}
+
+async function doLogin(){
+  var kk=document.getElementById('kk').value.trim();
+  var sn=document.getElementById('sandi').value.trim();
+  if(!kk||!sn){toast('Nomor KK & sandi wajib diisi ya!');return;}
+  var b=document.getElementById('go-login');busy(b,true);
+  try{
+    var res=await api('loginKK',kk,sn);
+    if(res&&res.ok){
+      S.t=res.token;
+      S.u={nama:res.nama,nomorRumah:res.nomorRumah,nomorKK:kk,isAdmin:!!res.isAdmin};
+      S.i=await api('getInfoPublik');
+      go('home');
+    }else{
+      toast((res&&res.message)||'Login gagal, cek kembali KK & PIN.');
+      busy(b,false);
+    }
+  }catch(e){toast(e.message);busy(b,false);}
+}
+
+function doLogout(){
+  if(!confirm('Keluar dari aplikasi WargaSpace?'))return;
+  api('logout',S.t).catch(function(){});
+  S.t='';S.u=null;S.i=null;S.s=[];S.tg=null;S.r=[];S.j=[];
+  go('login');
+}
+
+function openModalSurat(){
+  var opts=S.j.map(function(j){return '<option value="'+esc(j.id)+'">'+esc(j.label)+'</option>';}).join('');
+  var m=document.createElement('div');m.className='modal-fixed open';
+  m.innerHTML='<div class="modal-box"><div class="mh"><div class="modal-title">Form Pengajuan Surat ✉️</div><button class="mx" data-close>&times;</button></div><div class="fg"><span class="lbl">Jenis Surat</span><select id="ms-jenis" class="input">'+opts+'</select><p id="ms-desc" class="sm" style="font-size:12px;margin-top:6px"></p></div><div id="ms-f"></div><button id="ms-send" class="btn" style="margin-top:16px">Kirim Pengajuan 🚀</button></div>';
+  document.body.appendChild(m);
+  function rf(){
+    var v=document.getElementById('ms-jenis').value;
+    var it=S.j.find(function(x){return x.id===v;});
+    document.getElementById('ms-desc').textContent=it?it.desc:'';
+    var c=document.getElementById('ms-f');c.innerHTML='';
+    (it&&it.fields||[]).forEach(function(f){
+      c.innerHTML+='<div class="fg"><span class="lbl">'+esc(f.label)+'</span><input name="'+esc(f.key)+'" class="input dyn" placeholder="'+esc(f.placeholder||'')+'"></div>';
+    });
+  }
+  var closes=m.querySelectorAll('[data-close]');
+  for(var i=0;i<closes.length;i++) closes[i].addEventListener('click',function(){m.remove();});
+  document.getElementById('ms-jenis').addEventListener('change',rf);
+  document.getElementById('ms-send').addEventListener('click',async function(){
+    var j=document.getElementById('ms-jenis').value;var ins=document.querySelectorAll('.dyn');var d={};var ok=true;
+    ins.forEach(function(x){if(!x.value.trim())ok=false;d[x.name]=x.value.trim();});
+    if(!ok){toast('Semua field wajib diisi ya!');return;}
+    var b=document.getElementById('ms-send');busy(b,true);
+    try{
+      await api('ajukanSurat',S.t,j,d);
+      toast('Surat berhasil diajukan! 🎉');
+      m.remove();
+      S.s=await api('listSuratKK',S.t);
+      renderSurat();
+    }catch(e){toast(e.message);busy(b,false);}
+  });
+  rf();
+}
+
+function openModalBayar(){
+  var m=document.createElement('div');m.className='modal-fixed open';
+  m.innerHTML='<div class="modal-box"><div class="mh"><div class="modal-title">Konfirmasi Bayar Iuran 💳</div><button class="mx" data-close>&times;</button></div><div class="fg"><span class="lbl">Foto Bukti Transfer / QRIS</span><input type="file" id="mb-file" accept="image/*" class="input" style="padding:10px"></div><img id="mb-prev" class="thumb"><div class="fg" style="margin-top:12px"><span class="lbl">Catatan (opsional)</span><input id="mb-cat" class="input" placeholder="cth: Transfer via BCA a.n Warga"></div><button id="mb-send" class="btn" style="margin-top:16px">Kirim Bukti Bayar 📤</button></div>';
+  document.body.appendChild(m);
+  var closes=m.querySelectorAll('[data-close]');
+  for(var i=0;i<closes.length;i++) closes[i].addEventListener('click',function(){m.remove();});
+  document.getElementById('mb-file').addEventListener('change',function(e){
+    var f=e.target.files[0];if(!f)return;
+    var r=new FileReader();
+    r.onload=function(ev){
+      var img=document.getElementById('mb-prev');
+      img.src=ev.target.result;img.classList.add('show');
+    };
+    r.readAsDataURL(f);
+  });
+  document.getElementById('mb-send').addEventListener('click',function(){
+    var f=document.getElementById('mb-file').files[0];
+    if(!f){toast('Pilih foto bukti dulu ya!');return;}
+    var b=document.getElementById('mb-send');busy(b,true);
+    var r=new FileReader();
+    r.onload=function(ev){
+      dsc(ev.target.result).then(function(small){
+        api('bayarIuran',S.t,small,document.getElementById('mb-cat').value.trim()).then(function(){
+          toast('Bukti bayar terkirim! Terima kasih 🙏');m.remove();go('iuran');
+        }).catch(function(e){toast(e.message);busy(b,false);});
+      }).catch(function(){toast('Gagal proses gambar');busy(b,false);});
+    };
+    r.onerror=function(){toast('Gagal baca file');busy(b,false);};
+    r.readAsDataURL(f);
+  });
+}
+
+function dsc(d,max,q){
+  max=max||1000;q=q||0.75;
+  return new Promise(function(rs){
+    var i=new Image();
+    i.onload=function(){
+      var s=Math.min(1,max/Math.max(i.width,i.height));
+      var w=Math.round(i.width*s),h=Math.round(i.height*s);
+      var c=document.createElement('canvas');c.width=w;c.height=h;
+      c.getContext('2d').drawImage(i,0,0,w,h);
+      rs(c.toDataURL('image/jpeg',q));
+    };
+    i.onerror=function(){rs(d);};
+    i.src=d;
+  });
+}
+
+go('login');
+</script>
+</body>
+</html>
