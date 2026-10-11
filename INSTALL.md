@@ -1,11 +1,27 @@
-# WargaSpace — Panduan Setup & Deploy
+# 🛠️ WargaSpace — Panduan Instalasi & Deploy
 
-Struktur project: **tepat 2 file** — `Code.gs` (backend) + `index.html` (frontend SPA).
+Panduan lengkap memasang WargaSpace dari nol sampai jalan, dalam **±15 menit**.
 
-## Prerequisites
-- Akun Google (Gmail/Google Workspace)
-- Akses ke Google Drive (tempat file template surat, bukti bayar)
-- Akun Fonnte (opsional, untuk notifikasi WhatsApp)
+> Struktur project: **tepat 2 file** — `Code.gs` (backend) + `index.html` (frontend SPA).
+
+## 📋 Yang Kamu Butuhkan (Prerequisites)
+
+- [ ] Akun Google (Gmail / Google Workspace) — gratis
+- [ ] Akses Google Drive (untuk folder surat PDF & bukti bayar)
+- [ ] Akun [Fonnte](https://fonnte.com) — **opsional**, hanya untuk notifikasi WhatsApp
+- [ ] Daftar warga RT (Nomor KK, NIK, Nama, No. HP, Nomor Rumah)
+
+## 🗺️ Peta Instalasi
+
+```text
+Langkah 1  Buat Spreadsheet (database)
+Langkah 2  Buat project Apps Script + paste 2 file
+Langkah 3  Inisialisasi tab database
+Langkah 4  Isi konfigurasi (Config)
+Langkah 5  Buat template surat (Google Docs)
+Langkah 6  Tambah data warga
+Langkah 7  Deploy jadi Web App + bagikan URL
+```
 
 ---
 
@@ -116,10 +132,53 @@ Buka sheet `Warga` → tambahkan data:
 
 - Pengurus = KK dengan kolom `Admin: TRUE` di sheet `Warga`.
 - Setelah login, pengurus melihat kartu **Panel Admin** + item nav **Admin**.
-- Panel berisi 3 tab:
+- Panel berisi 4 tab:
   - **Surat** → Setujui (auto-generate PDF + WA notif) / Tolak
   - **Iuran** → Valid (LUNAS) / Tolak bukti (dengan link bukti bayar)
   - **Kas** → Total kas & rekap per bulan
+  - **Pengurus** → Jadikan / cabut admin warga lain langsung dari aplikasi
+
+### Kelola Pengurus (tab "👥 Pengurus")
+
+- Menampilkan semua warga (Nama, Nomor KK, No. Rumah) + badge **Pengurus** / **Warga**.
+- Tombol **Jadikan Admin** → set kolom `Admin` warga tersebut jadi `TRUE`.
+- Tombol **Cabut Admin** → set jadi `FALSE` (dengan konfirmasi).
+- **Pengaman:** tidak bisa mencabut status admin diri sendiri (mencegah terkunci dari panel).
+- **Catatan:** perubahan status admin berlaku **saat warga tersebut login ulang** (sesi/token lama masih menyimpan status sebelumnya).
+- Data sensitif (`NIK`, `Sandi_KK`) **tidak** dikirim ke halaman ini.
+
+---
+
+## Keamanan (Authorization Model)
+
+> **Penting:** Di Google Apps Script, **SEMUA fungsi top-level** di `Code.gs`
+> otomatis bisa dipanggil dari browser warga lewat `google.script.run.<namaFungsi>`.
+> Karena itu otorisasi tidak boleh hanya di UI.
+
+Penerapan di project ini:
+
+1. **Semua helper internal dibungkus namespace `H`** (IIFE).
+   Properti object **tidak** diekspos ke `google.script.run`, jadi helper seperti
+   `readRows`, `setSuratStatus`, `setIuranStatus`, `setCfg`, `getAllConfig`,
+   `generatePdfFromTemplate`, `kirimWa`, dsb. **tidak dapat dipanggil** dari client.
+   Ini menutup celah bypass (mis. non-admin memanggil `setSuratStatus` langsung,
+   atau `readRows('Warga')` untuk membocorkan data + sandi warga).
+
+2. **API publik tetap top-level** tapi selalu memverifikasi token:
+   - Fungsi warga (`ajukanSurat`, `listSuratKK`, `bayarIuran`, `riwayatIuran`,
+     `getTagihanAktif`, `me`) → `requireKK(token)`.
+   - Fungsi admin (`admin*`) → `requireAdmin(token)` (menolak non-admin).
+
+3. **Token sesi** dibuat server-side (`Utilities.getUuid()`), disimpan di
+   `CacheService` selama 12 jam, berisi `Nomor_KK|isAdmin`. Tidak bisa dipalsukan
+   dari client (tidak ada HMAC, tapi cache tak bisa ditulis dari luar).
+
+4. **Data sensitif tidak bocor**: `getInfoPublik()` hanya mengembalikan field
+   publik — **tidak** mengembalikan `Token_Fonnte` atau isi `Config` penuh.
+
+> Untuk RT dengan kebutuhan lebih ketat: tambahkan rate-limit pada `loginKK`
+> (cegah brute-force PIN) dan/atau `LockService` untuk mencegah race condition
+> saat dua pengurus memproses data yang sama.
 
 ---
 

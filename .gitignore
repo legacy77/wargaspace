@@ -1,0 +1,51 @@
+# ─── Dependencies ───────────────────────────────────────────
+node_modules/
+package.json
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# ─── Test / scratch artifacts (jangan ikut ke repo) ─────────
+_test_*.mjs
+_tester_*.mjs
+_diag*.mjs
+_test_*.js
+*.test.tmp
+.tmp/
+coverage/
+
+# ─── Tooling AI / agent (biar repo bersih) ──────────────────
+.claude/
+.agent/
+.cursor/
+.aider*
+.continue/
+skills/
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.copilot/
+*.prompt.md
+
+# ─── Google Apps Script / clasp ─────────────────────────────
+.clasp.json
+.clasprc.json
+appsscript.json
+
+# ─── Editor & OS ────────────────────────────────────────────
+.vscode/
+.idea/
+*.swp
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ─── Logs & env ─────────────────────────────────────────────
+*.log
+npm-debug.log*
+.env
+.env.*
+
+# ─── Build output ───────────────────────────────────────────
+dist/
+build/
